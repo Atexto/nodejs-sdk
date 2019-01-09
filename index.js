@@ -1,18 +1,19 @@
 const request = require('superagent-promise')(require('superagent'), Promise)
+const qs = require('qs')
 
 const sdk = {
-  version: '0.9.0'
+  version: '0.9.1'
 }
 
 class Client {
   constructor (options = {}) {
-    this.token = options.token
+    this.key = options.key
     this.secret = options.secret
     this.baseUrl = options.baseUrl || 'https://api.atext.io'
   }
 
   getToken () {
-    const encoded = Buffer.from(this.token + ':' + this.secret).toString('base64')
+    const encoded = Buffer.from(this.key + ':' + this.secret).toString('base64')
     return 'Basic ' + encoded
   }
 
@@ -31,9 +32,9 @@ class Client {
     return res.body
   }
 
-  async listTranscripts () {
-    const url = `${this.baseUrl}/v1/transcripts`
+  async listTranscripts (filter = {}) {
     const token = this.getToken()
+    const url = `${this.baseUrl}/v1/transcripts?${qs.stringify(filter)}`
 
     const res = await request
       .get(url)
